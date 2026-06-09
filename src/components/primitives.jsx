@@ -7,6 +7,59 @@ export function Card({ className = '', children }) {
   )
 }
 
+/** Compact labelled numeric field with an optional unit suffix. */
+export function NumberField({ label, value, onChange, unit, min = 0, step = 0.1 }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-[11px] font-semibold text-neutral-500">{label}</span>
+      <div className="flex items-center rounded-xl border border-neutral-200 bg-neutral-50 px-3 focus-within:border-brand focus-within:bg-white">
+        <input
+          type="number"
+          inputMode="decimal"
+          min={min}
+          step={step}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full bg-transparent py-2.5 text-lg font-semibold text-neutral-900 outline-none"
+        />
+        {unit && <span className="pl-1 text-sm text-neutral-400">{unit}</span>}
+      </div>
+    </label>
+  )
+}
+
+/** Pill group where each option can carry a small hint line (shape, porosity). */
+export function ChoiceGroup({ options, value, onChange }) {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {options.map((opt) => {
+        const selected = opt.value === value
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            className={`rounded-xl border px-2 py-2.5 text-center transition-all ${
+              selected
+                ? 'border-neutral-900 bg-neutral-900 text-white shadow-md'
+                : 'border-neutral-200 bg-neutral-50 text-neutral-600 hover:border-neutral-300'
+            }`}
+          >
+            <span className="block text-sm font-bold leading-tight">{opt.label}</span>
+            {opt.hint && (
+              <span
+                className={`mt-0.5 block text-[10px] leading-tight ${selected ? 'text-white/70' : 'text-neutral-400'}`}
+              >
+                {opt.hint}
+              </span>
+            )}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 /** Small uppercase caption above a control. */
 export function SectionLabel({ children, className = '' }) {
   return <p className={`label-caps mb-3 text-center ${className}`}>{children}</p>
@@ -104,5 +157,17 @@ export function Slider({ value, onChange, min = 0, max = 20, step = 1 }) {
         background: `linear-gradient(to right, #dc3947 0%, #dc3947 ${pct}%, #e5e5e5 ${pct}%, #e5e5e5 100%)`,
       }}
     />
+  )
+}
+
+/** Standard estimation disclaimer shown under each calculator. */
+export function Disclaimer() {
+  return (
+    <p className="px-2 text-sm font-light leading-relaxed text-neutral-500">
+      Coverage rates are approximate and based on smooth, horizontal surfaces. Actual
+      coverage will vary with the condition and absorbency of the concrete. These figures
+      are for estimation purposes only. For optimal performance, up to three (3) coats may
+      be applied.
+    </p>
   )
 }

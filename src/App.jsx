@@ -1,15 +1,58 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LayoutGrid, Beaker } from 'lucide-react'
 import AreaCalculator from './components/AreaCalculator'
 import VolumeCalculator from './components/VolumeCalculator'
+import { newSurface } from './lib/geometry'
+import { readSharedState, writeSharedState } from './lib/share'
+import { DEFAULT_PRICES, DEFAULT_CURRENCY } from './lib/config'
 
 const TABS = [
   { key: 'area', label: 'By Area', icon: LayoutGrid },
   { key: 'volume', label: 'By Volume', icon: Beaker },
 ]
 
+const PRICES_KEY = 'core100.prices'
+const CURRENCY_KEY = 'core100.currency'
+const DEFAULT_VOL = { containerIndex: 0, count: 1, coats: 1, porosity: 'medium' }
+
+// Pull any shared project out of the URL once, before first render.
+const shared = readSharedState()
+
+function loadLocal(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? JSON.parse(raw) : fallback
+  } catch {
+    return fallback
+  }
+}
+
 export default function App() {
-  const [mode, setMode] = useState('area')
+  const [mode, setMode] = useState(shared?.mode || 'area')
+  const [surfaces, setSurfaces] = useState(
+    shared?.surfaces?.length ? shared.surfaces : [newSurface(0)],
+  )
+  const [buffer, setBuffer] = useState(shared?.buffer ?? 0)
+  const [prices, setPrices] = useState(
+    shared?.prices || loadLocal(PRICES_KEY, DEFAULT_PRICES),
+  )
+  const [currency, setCurrency] = useState(
+    shared?.currency || loadLocal(CURRENCY_KEY, DEFAULT_CURRENCY),
+  )
+  const [vol, setVol] = useState({ ...DEFAULT_VOL, ...(shared?.vol || {}) })
+
+  // Keep the URL hash and local settings in sync with state.
+  const first = useRef(true)
+  useEffect(() => {
+    writeSharedState({ mode, surfaces, buffer, prices, currency, vol })
+    try {
+      localStorage.setItem(PRICES_KEY, JSON.stringify(prices))
+      localStorage.setItem(CURRENCY_KEY, JSON.stringify(currency))
+    } catch {
+      /* storage unavailable — non-fatal */
+    }
+    first.current = false
+  }, [mode, surfaces, buffer, prices, currency, vol])
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -26,7 +69,7 @@ export default function App() {
         </header>
 
         {/* Mode switcher */}
-        <div className="mb-5 flex rounded-2xl bg-white p-1 shadow-card">
+        <div className="mb-5 flex rounded-2xl bg-white p-1 shadow-card print:hidden">
           {TABS.map((tab) => {
             const Icon = tab.icon
             const active = mode === tab.key
@@ -49,7 +92,20 @@ export default function App() {
         </div>
 
         {/* Active calculator */}
-        {mode === 'area' ? <AreaCalculator /> : <VolumeCalculator />}
+        {mode === 'area' ? (
+          <AreaCalculator
+            surfaces={surfaces}
+            setSurfaces={setSurfaces}
+            buffer={buffer}
+            setBuffer={setBuffer}
+            prices={prices}
+            setPrices={setPrices}
+            currency={currency}
+            setCurrency={setCurrency}
+          />
+        ) : (
+          <VolumeCalculator vol={vol} setVol={setVol} />
+        )}
 
         {/* Footer */}
         <footer className="mt-8 text-center text-xs font-light text-neutral-400">
@@ -79,7 +135,7 @@ function Wordmark() {
 
   return (
     <img
-      src="http://craftbar.ph/CORE100-01.png"
+      src="/core100-logo.png"
       alt="Blocmate CORE100"
       className="mx-auto h-auto w-full max-w-[280px] select-none"
       draggable={false}

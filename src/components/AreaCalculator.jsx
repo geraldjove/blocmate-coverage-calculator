@@ -20,6 +20,7 @@ export default function AreaCalculator({
   setPrices,
   currency,
   setCurrency,
+  getShareUrl,
 }) {
   const result = useMemo(
     () => calcProject(surfaces, buffer, prices),
@@ -80,7 +81,10 @@ export default function AreaCalculator({
 
       {/* Actions */}
       <BuyButton recommended={result.recommended} />
-      <ShareBar getSummary={() => buildSummary({ surfaces, buffer, result, currency })} />
+      <ShareBar
+        getShareUrl={getShareUrl}
+        getSummary={() => buildSummary({ surfaces, buffer, result, currency })}
+      />
 
       <Disclaimer />
 

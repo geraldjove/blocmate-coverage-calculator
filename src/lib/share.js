@@ -31,11 +31,13 @@ export function readSharedState() {
   return m ? decodeState(m[1]) : null
 }
 
-/** Write the project into the URL hash without adding a history entry. */
-export function writeSharedState(state) {
-  if (typeof window === 'undefined') return
-  const hash = `#p=${encodeState(state)}`
-  window.history.replaceState(null, '', hash)
+/** Build a shareable URL that carries the encoded project in its hash. */
+export function buildShareUrl(state) {
+  const base =
+    typeof window === 'undefined'
+      ? ''
+      : `${window.location.origin}${window.location.pathname}`
+  return `${base}#p=${encodeState(state)}`
 }
 
 const r1 = (n) => (Math.round(n * 10) / 10).toFixed(1)

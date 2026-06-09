@@ -3,9 +3,10 @@ import { Link2, ClipboardCopy, Printer, Check } from 'lucide-react'
 
 /**
  * Action row: copy a shareable link, copy a text summary, or print / save PDF.
- * `getSummary` returns the plain-text summary on demand.
+ * `getShareUrl` and `getSummary` build the link / text on demand, so nothing is
+ * written to the address bar until the user actually copies a link.
  */
-export default function ShareBar({ getSummary }) {
+export default function ShareBar({ getShareUrl, getSummary }) {
   const [copied, setCopied] = useState(null) // 'link' | 'summary' | null
 
   const flash = (which) => {
@@ -35,7 +36,7 @@ export default function ShareBar({ getSummary }) {
         icon={copied === 'link' ? Check : Link2}
         label={copied === 'link' ? 'Copied!' : 'Copy link'}
         active={copied === 'link'}
-        onClick={() => copy(window.location.href, 'link')}
+        onClick={() => copy(getShareUrl(), 'link')}
       />
       <Action
         icon={copied === 'summary' ? Check : ClipboardCopy}

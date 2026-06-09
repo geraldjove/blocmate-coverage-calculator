@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LayoutGrid, Beaker } from 'lucide-react'
 import AreaCalculator from './components/AreaCalculator'
 import SimpleAreaCalculator from './components/SimpleAreaCalculator'
 import VolumeCalculator from './components/VolumeCalculator'
 import { newSurface, newSimpleSurface } from './lib/geometry'
-import { readSharedState, writeSharedState } from './lib/share'
+import { readSharedState, buildShareUrl } from './lib/share'
 import { DEFAULT_PRICES, DEFAULT_CURRENCY } from './lib/config'
 
 const TABS = [
@@ -49,10 +49,9 @@ export default function App() {
   )
   const [vol, setVol] = useState({ ...DEFAULT_VOL, ...(shared?.vol || {}) })
 
-  // Keep the URL hash and local settings in sync with state.
-  const first = useRef(true)
+  // Persist user settings locally. The shareable URL is built on demand (when
+  // the user clicks "Copy link") so the address bar stays clean.
   useEffect(() => {
-    writeSharedState({ mode, complexity, surfaces, simpleSurface, buffer, prices, currency, vol })
     try {
       localStorage.setItem(PRICES_KEY, JSON.stringify(prices))
       localStorage.setItem(CURRENCY_KEY, JSON.stringify(currency))
@@ -60,8 +59,10 @@ export default function App() {
     } catch {
       /* storage unavailable — non-fatal */
     }
-    first.current = false
-  }, [mode, complexity, surfaces, simpleSurface, buffer, prices, currency, vol])
+  }, [complexity, prices, currency])
+
+  const getShareUrl = () =>
+    buildShareUrl({ mode, complexity, surfaces, simpleSurface, buffer, prices, currency, vol })
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -116,6 +117,7 @@ export default function App() {
               setSurface={setSimpleSurface}
               prices={prices}
               currency={currency}
+              getShareUrl={getShareUrl}
             />
           ) : (
             <AreaCalculator
@@ -127,6 +129,7 @@ export default function App() {
               setPrices={setPrices}
               currency={currency}
               setCurrency={setCurrency}
+              getShareUrl={getShareUrl}
             />
           )
         ) : (

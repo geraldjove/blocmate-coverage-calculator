@@ -20,7 +20,7 @@ const POROSITY_OPTIONS = POROSITY_KEYS.map((value) => ({
  * Mirrors the classic single-field calculator while reusing the shared
  * results / cost / share / print pipeline via a single `area` surface.
  */
-export default function SimpleAreaCalculator({ surface, setSurface, prices, currency }) {
+export default function SimpleAreaCalculator({ surface, setSurface, prices, currency, getShareUrl }) {
   const surfaces = useMemo(() => [surface], [surface])
   const result = useMemo(() => calcProject(surfaces, 0, prices), [surfaces, prices])
 
@@ -71,6 +71,7 @@ export default function SimpleAreaCalculator({ surface, setSurface, prices, curr
       {/* Actions */}
       <BuyButton recommended={result.recommended} />
       <ShareBar
+        getShareUrl={getShareUrl}
         getSummary={() => buildSummary({ surfaces, buffer: 0, result, currency })}
       />
 

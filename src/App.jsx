@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { LayoutGrid, Beaker } from 'lucide-react'
 import AreaCalculator from './components/AreaCalculator'
+import SimpleAreaCalculator from './components/SimpleAreaCalculator'
 import VolumeCalculator from './components/VolumeCalculator'
-import { newSurface } from './lib/geometry'
+import { newSurface, newSimpleSurface } from './lib/geometry'
 import { readSharedState, writeSharedState } from './lib/share'
 import { DEFAULT_PRICES, DEFAULT_CURRENCY } from './lib/config'
 
@@ -13,6 +14,7 @@ const TABS = [
 
 const PRICES_KEY = 'core100.prices'
 const CURRENCY_KEY = 'core100.currency'
+const COMPLEXITY_KEY = 'core100.complexity'
 const DEFAULT_VOL = { containerIndex: 0, count: 1, coats: 1, porosity: 'medium' }
 
 // Pull any shared project out of the URL once, before first render.
@@ -29,8 +31,14 @@ function loadLocal(key, fallback) {
 
 export default function App() {
   const [mode, setMode] = useState(shared?.mode || 'area')
+  const [complexity, setComplexity] = useState(
+    shared?.complexity || loadLocal(COMPLEXITY_KEY, 'simple'),
+  )
   const [surfaces, setSurfaces] = useState(
     shared?.surfaces?.length ? shared.surfaces : [newSurface(0)],
+  )
+  const [simpleSurface, setSimpleSurface] = useState(
+    shared?.simpleSurface || newSimpleSurface(),
   )
   const [buffer, setBuffer] = useState(shared?.buffer ?? 0)
   const [prices, setPrices] = useState(
@@ -44,15 +52,16 @@ export default function App() {
   // Keep the URL hash and local settings in sync with state.
   const first = useRef(true)
   useEffect(() => {
-    writeSharedState({ mode, surfaces, buffer, prices, currency, vol })
+    writeSharedState({ mode, complexity, surfaces, simpleSurface, buffer, prices, currency, vol })
     try {
       localStorage.setItem(PRICES_KEY, JSON.stringify(prices))
       localStorage.setItem(CURRENCY_KEY, JSON.stringify(currency))
+      localStorage.setItem(COMPLEXITY_KEY, JSON.stringify(complexity))
     } catch {
       /* storage unavailable — non-fatal */
     }
     first.current = false
-  }, [mode, surfaces, buffer, prices, currency, vol])
+  }, [mode, complexity, surfaces, simpleSurface, buffer, prices, currency, vol])
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -91,18 +100,35 @@ export default function App() {
           })}
         </div>
 
+        {/* Simplified / Advanced toggle — only meaningful for the area calculator */}
+        {mode === 'area' && (
+          <div className="mb-5 flex items-center justify-between print:hidden">
+            <span className="label-caps">Detail Level</span>
+            <ComplexityToggle value={complexity} onChange={setComplexity} />
+          </div>
+        )}
+
         {/* Active calculator */}
         {mode === 'area' ? (
-          <AreaCalculator
-            surfaces={surfaces}
-            setSurfaces={setSurfaces}
-            buffer={buffer}
-            setBuffer={setBuffer}
-            prices={prices}
-            setPrices={setPrices}
-            currency={currency}
-            setCurrency={setCurrency}
-          />
+          complexity === 'simple' ? (
+            <SimpleAreaCalculator
+              surface={simpleSurface}
+              setSurface={setSimpleSurface}
+              prices={prices}
+              currency={currency}
+            />
+          ) : (
+            <AreaCalculator
+              surfaces={surfaces}
+              setSurfaces={setSurfaces}
+              buffer={buffer}
+              setBuffer={setBuffer}
+              prices={prices}
+              setPrices={setPrices}
+              currency={currency}
+              setCurrency={setCurrency}
+            />
+          )
         ) : (
           <VolumeCalculator vol={vol} setVol={setVol} />
         )}
@@ -112,6 +138,35 @@ export default function App() {
           Blocmate CORE100 · Penetrating Concrete Sealer
         </footer>
       </div>
+    </div>
+  )
+}
+
+/** Compact pill toggle between the simplified and advanced area calculators. */
+function ComplexityToggle({ value, onChange }) {
+  const options = [
+    { key: 'simple', label: 'Simplified' },
+    { key: 'advanced', label: 'Advanced' },
+  ]
+  return (
+    <div className="flex rounded-full bg-white p-1 shadow-card">
+      {options.map((opt) => {
+        const active = value === opt.key
+        return (
+          <button
+            key={opt.key}
+            type="button"
+            onClick={() => onChange(opt.key)}
+            className={`rounded-full px-4 py-1.5 text-xs font-bold transition-all duration-200 ${
+              active
+                ? 'bg-neutral-900 text-white shadow-sm'
+                : 'text-neutral-400 hover:text-neutral-600'
+            }`}
+          >
+            {opt.label}
+          </button>
+        )
+      })}
     </div>
   )
 }

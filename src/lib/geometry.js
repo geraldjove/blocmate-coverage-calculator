@@ -12,6 +12,9 @@ const num = (v) => {
 export function grossArea(surface) {
   const d = surface.dims || {}
   switch (surface.shape) {
+    case 'area':
+      // Simplified mode — the user enters a total area directly.
+      return num(d.area)
     case 'circle':
       return Math.PI * Math.pow(num(d.diameter) / 2, 2)
     case 'lshape':
@@ -43,6 +46,19 @@ export function newSurface(index = 0) {
     name: `Surface ${index + 1}`,
     shape: 'rect',
     dims: { length: 5, width: 4, diameter: 4, lengthA: 4, widthA: 3, lengthB: 2, widthB: 2 },
+    openings: [],
+    coats: 1,
+    porosity: 'medium',
+  }
+}
+
+/** A single direct-area surface for the simplified calculator. */
+export function newSimpleSurface() {
+  return {
+    id: 'simple',
+    name: 'Project area',
+    shape: 'area',
+    dims: { area: 20 },
     openings: [],
     coats: 1,
     porosity: 'medium',

@@ -8,6 +8,7 @@ const money = (currency, n) =>
 
 function dims(s) {
   const d = s.dims || {}
+  if (s.shape === 'area') return `${d.area} m²`
   if (s.shape === 'circle') return `⌀ ${d.diameter} m`
   if (s.shape === 'lshape') return `${d.lengthA}×${d.widthA} + ${d.lengthB}×${d.widthB} m`
   return `${d.length} × ${d.width} m`
@@ -34,7 +35,7 @@ export default function PrintSummary({ surfaces, buffer, result, currency }) {
             <tr key={s.id} className="border-b border-neutral-200">
               <td className="py-1 pr-2">{s.name}</td>
               <td className="py-1 pr-2">
-                {SHAPES[s.shape].label} {dims(s)}
+                {(SHAPES[s.shape]?.label ?? 'Area')} {dims(s)}
               </td>
               <td className="py-1 pr-2">{r1(netArea(s))} m²</td>
               <td className="py-1 pr-2">{s.coats}</td>

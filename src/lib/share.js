@@ -43,6 +43,7 @@ const r1 = (n) => (Math.round(n * 10) / 10).toFixed(1)
 /** Human-readable dimension string for a surface. */
 function dimsText(s) {
   const d = s.dims || {}
+  if (s.shape === 'area') return `${d.area} m²`
   if (s.shape === 'circle') return `⌀ ${d.diameter} m`
   if (s.shape === 'lshape')
     return `${d.lengthA}×${d.widthA} m + ${d.lengthB}×${d.widthB} m`
@@ -59,7 +60,7 @@ export function buildSummary({ surfaces, buffer, result, currency }) {
   lines.push('===================================')
   surfaces.forEach((s, i) => {
     lines.push(
-      `${i + 1}. ${s.name} — ${SHAPES[s.shape].label} ${dimsText(s)}` +
+      `${i + 1}. ${s.name} — ${(SHAPES[s.shape]?.label ?? 'Area')} ${dimsText(s)}` +
         (grossArea(s) !== netArea(s) ? ` (less openings)` : ''),
     )
     lines.push(

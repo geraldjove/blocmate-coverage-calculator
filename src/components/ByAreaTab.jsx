@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Plus, Minus, Flame } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
@@ -11,7 +11,7 @@ const SKUS = [
   { label: "22L", liters: 22 },
 ];
 
-export default function ByAreaTab() {
+export default function ByAreaTab({ onReport }) {
   const [area, setArea] = useState(10);
   const [coats, setCoats] = useState(1);
   const [buffer, setBuffer] = useState(0);
@@ -66,6 +66,36 @@ export default function ByAreaTab() {
       recommended,
     };
   }, [area, coats, buffer]);
+
+  // Report current inputs and results up to Home for the "Save Result" report.
+  useEffect(() => {
+    onReport?.({
+      mode: "area",
+      inputs: [
+        { label: "Area", value: `${parseInt(area) || 1} m²` },
+        { label: "Coats", value: coats },
+        { label: "Buffer", value: `${buffer}%` },
+      ],
+      primary: {
+        label: "You'll Need Approximately",
+        value: `${calc.litersNeeded} L`,
+        sub: `${calc.gallonsNeeded} gal`,
+      },
+      recommended: {
+        sku: calc.recommended.label,
+        units: calc.recommended.units,
+        total: calc.recommended.totalLiters.toFixed(1),
+        excess: calc.recommended.leftover.toFixed(1),
+      },
+      options: calc.skuEstimates.map((s) => ({
+        label: s.label,
+        units: s.units,
+        total: s.totalLiters.toFixed(1),
+        leftover: s.leftover.toFixed(1),
+        recommended: s.label === calc.recommended.label,
+      })),
+    });
+  }, [area, coats, buffer, calc, onReport]);
 
   const adjustArea = (delta) => {
     setArea((prev) => Math.max(1, prev + delta));

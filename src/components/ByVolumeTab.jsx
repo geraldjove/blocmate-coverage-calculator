@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Plus, Minus, Flame } from "lucide-react";
 
 // ── Constants ──
@@ -10,7 +10,7 @@ const SKUS = [
   { label: "22L", liters: 22 },
 ];
 
-export default function ByVolumeTab() {
+export default function ByVolumeTab({ onReport }) {
   const [selectedSku, setSelectedSku] = useState(0); // index into SKUS
   const [units, setUnits] = useState(1);
   const [coats, setCoats] = useState(1);
@@ -30,6 +30,28 @@ export default function ByVolumeTab() {
       skuLabel: sku.label,
     };
   }, [selectedSku, units, coats]);
+
+  // Report current inputs and results up to Home for the "Save Result" report.
+  useEffect(() => {
+    onReport?.({
+      mode: "volume",
+      inputs: [
+        { label: "Container Size", value: calc.skuLabel },
+        { label: "Containers", value: parseInt(units) || 1 },
+        { label: "Coats", value: coats },
+      ],
+      primary: {
+        label: "Total Volume",
+        value: `${calc.totalLiters} L`,
+        sub: `${calc.gallonsTotal} gal`,
+      },
+      secondary: {
+        label: "Approx Coverage",
+        value: `${calc.coverageFinal} m²`,
+      },
+      note: `Based on ${coats} coat${coats > 1 ? "s" : ""} at ${COVERAGE_RATE} m² per liter per coat.`,
+    });
+  }, [selectedSku, units, coats, calc, onReport]);
 
   return (
     <div className="space-y-5">

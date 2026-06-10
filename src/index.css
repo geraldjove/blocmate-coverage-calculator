@@ -82,7 +82,21 @@
     @apply border-border outline-ring/50;
   }
 
+  html,
+  body {
+    font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  }
+
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Form controls don't inherit font-family in every browser — force it so the
+     number inputs (area / containers) render in Montserrat too. */
+  input,
+  button,
+  textarea,
+  select {
+    font-family: inherit;
   }
 }

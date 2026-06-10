@@ -25,6 +25,21 @@ const pad = (n) => String(n).padStart(2, "0");
 const fileStamp = (d) =>
   `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
+// "July 10, 2026, 12:45 AM" — date and time joined with a comma (some browsers
+// insert " at " when both are requested in one toLocaleString call).
+const formatReportDate = (d) => {
+  const date = d.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  const time = d.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  return `${date}, ${time}`;
+};
+
 // Build (once) a self-contained @font-face stylesheet with the Montserrat
 // weights inlined as base64. Passing this to html-to-image as `fontEmbedCSS`
 // removes every network/CORS variable, so the report image always uses the
@@ -163,11 +178,10 @@ export default function Home() {
         <h1
           className="text-neutral-900 text-center"
           style={{
-            fontFamily: "'Montserrat', sans-serif",
             fontWeight: "700",
-            letterSpacing: "-0.5pt",
-            fontSize: "28pt",
-            whiteSpace: "nowrap",
+            letterSpacing: "-0.5px",
+            fontSize: "clamp(22px, 7vw, 37px)",
+            lineHeight: 1.1,
             marginTop: "5pt",
             marginBottom: "10pt",
           }}
@@ -234,10 +248,7 @@ export default function Home() {
         style={{ position: "fixed", left: "-10000px", top: 0, pointerEvents: "none" }}
       >
         <div ref={reportRef}>
-          <ResultReport
-            report={report}
-            dateText={savedAt ? savedAt.toLocaleString() : ""}
-          />
+          <ResultReport report={report} dateText={savedAt ? formatReportDate(savedAt) : ""} />
         </div>
       </div>
     </div>

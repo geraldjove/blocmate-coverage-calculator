@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { Plus, Minus, Flame } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
 
 // ── Constants ──
 const COVERAGE_RATE = 6; // m² per liter per coat

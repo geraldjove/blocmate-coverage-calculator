@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Ruler, Droplet, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { Ruler, Droplet, X, Camera } from "lucide-react";
+import { toPng } from "html-to-image";
 import { Button } from "@/components/ui/button";
 import ByAreaTab from "@/components/ByAreaTab";
 import ByVolumeTab from "@/components/ByVolumeTab";
@@ -12,6 +13,28 @@ const TABS = [
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("area");
+  const [capturing, setCapturing] = useState(false);
+  const captureRef = useRef(null);
+
+  const handleScreenshot = async () => {
+    if (!captureRef.current || capturing) return;
+    try {
+      setCapturing(true);
+      const dataUrl = await toPng(captureRef.current, {
+        pixelRatio: 2,
+        cacheBust: true,
+        backgroundColor: "#f7f7f5",
+      });
+      const link = document.createElement("a");
+      link.download = `core100-coverage-${activeTab}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Screenshot failed:", err);
+    } finally {
+      setCapturing(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f7f7f5]">
@@ -19,6 +42,9 @@ export default function Home() {
         @import url('https://fonts.cdnfonts.com/css/futura-condensed-pt');
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&display=swap');
       `}</style>
+
+      {/* Everything inside this wrapper is included in the screenshot */}
+      <div ref={captureRef} className="bg-[#f7f7f5]">
       {/* Header */}
       <div className="px-5 pt-8 pb-0 max-w-lg mx-auto">
         <img
@@ -70,12 +96,23 @@ export default function Home() {
       <div className="px-5 py-4 max-w-lg mx-auto">
         {activeTab === "area" ? <ByAreaTab /> : <ByVolumeTab />}
       </div>
+      </div>
+      {/* end screenshot area */}
 
-      {/* Close Button */}
-      <div className="px-5 pb-8 max-w-lg mx-auto">
+      {/* Actions */}
+      <div className="px-5 pb-8 max-w-lg mx-auto flex gap-3">
+        <Button
+          onClick={handleScreenshot}
+          disabled={capturing}
+          className="flex-1 flex items-center justify-center gap-2 h-12 rounded-xl bg-white text-neutral-900 border border-neutral-200 hover:bg-neutral-50 disabled:opacity-60"
+          style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold', fontSize: '16px' }}
+        >
+          <Camera className="h-5 w-5" />
+          {capturing ? "Saving…" : "Screenshot"}
+        </Button>
         <Button
           onClick={() => window.close()}
-          className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800"
+          className="flex-1 flex items-center justify-center gap-2 h-12 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold', fontSize: '16px' }}
         >
           <X className="h-5 w-5" />

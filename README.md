@@ -1,89 +1,33 @@
-# Blocmate CORE100 — Coverage Calculator
+# Blocmate CORE100 Coverage Calculator
 
-A refreshed, upgraded rebuild of the Blocmate CORE100 coverage calculator. Estimates how
-much CORE100 penetrating concrete sealer a project needs, either **by area** (how much
-product to buy) or **by volume** (how much area a given amount of product covers).
+A standalone calculator that estimates how much **Blocmate CORE100 Penetrating Concrete Sealer** a project needs, by area or by volume.
 
-Same brand identity as the original (brand red `#dc3947`, off-white canvas, Montserrat),
-redesigned with a cleaner layout and a much deeper feature set.
-
-- **Live:** https://blocmate-coverage-calculator.vercel.app
-- **Source:** https://github.com/geraldjove/blocmate-coverage-calculator
+It started as a [Base44](https://base44.com) app and has been stripped down to a plain **React + Vite + Tailwind** single‑page app with no backend — it builds to static files and can be hosted anywhere.
 
 ## Features
 
-- **Dimension input** — pick a shape (Rectangle / Circle / L-shape) and enter real
-  measurements; area is computed for you. Deduct openings (doors, drains, garden beds).
-- **Multi-surface projects** — add as many surfaces as the job has; each carries its own
-  shape, coats and porosity, and they roll up into one combined buy list.
-- **Surface porosity** — Smooth / Medium / Porous adjusts the coverage rate
-  (6 / 5 / 4 m² per litre per coat) for a realistic estimate.
-- **Cost estimation** — enter your own per-container prices (saved locally) to see total
-  cost and cost per m², shown on every container option.
-- **Smart SKU recommendation** — picks the container mix with the least leftover.
-- **Share & print** — the whole project lives in the URL (copy a link), copy a text
-  summary, or print / save a clean PDF quote.
-- **Installable PWA** — works offline and installs to a phone home screen.
-- **Buy CTA** — carries the recommended SKU + quantity through to the store.
+- **By Area** — enter area (m²), number of coats (1–3) and an optional buffer (0–20%); get the litres/gallons required, a recommended container, and a full breakdown of all container options.
+- **By Volume** — pick a container size and quantity to see the total volume and the area it covers.
+- Coverage is calculated at **6 m² per litre per coat** (smooth, horizontal surfaces).
 
-## Tech stack
-
-React 18 · Vite 5 · Tailwind CSS 3 · lucide-react · vite-plugin-pwa
-
-## Getting started
+## Development
 
 ```bash
 npm install
-npm run dev      # dev server (http://localhost:5173)
-npm run build    # production build into dist/
+npm run dev      # start the dev server
+npm run build    # production build → dist/
 npm run preview  # preview the production build
 ```
 
-Regenerate the brand app icons (only needed if you change the icon design):
+## Deployment
 
-```bash
-node scripts/gen-icons.mjs
-```
+This is a static Vite SPA. On **Vercel**, the framework preset is auto‑detected:
 
-## How the maths works
+- Build command: `npm run build`
+- Output directory: `dist`
 
-Constants live in [`src/lib/config.js`](src/lib/config.js):
+No environment variables are required.
 
-- **Coverage rate:** 6 / 5 / 4 m² per litre per coat (smooth / medium / porous)
-- **Container sizes (SKUs):** 1 L, 4.5 L, 22 L
-- **Gallon conversion:** 1 US gallon = 3.78541 L
+## Tech
 
-**By Area** — each surface contributes `area × coats ÷ coverageRate(porosity)` litres;
-surfaces are summed and a global safety buffer is applied. The app then sizes every
-container SKU and recommends the least-wasteful option.
-
-**By Volume** — `coverage = (containerSize × count × coverageRate(porosity)) ÷ coats`.
-
-## Project structure
-
-```
-src/
-  App.jsx                    # header, mode switcher, state + URL-share/persist
-  lib/
-    config.js                # product facts, pricing, links — tweak here
-    geometry.js              # shapes → net area
-    calc.js                  # coverage, SKU recommendation, cost
-    share.js                 # URL encode/decode + text summary
-  components/
-    primitives.jsx           # Card, Segmented, Stepper, Slider, NumberField, ChoiceGroup
-    SurfaceCard.jsx          # one editable surface
-    AreaCalculator.jsx       # "By Area" project
-    VolumeCalculator.jsx     # "By Volume" mode
-    CostSettings.jsx         # prices + currency
-    ResultsPanel.jsx         # recommendation + options + cost
-    BuyButton.jsx / ShareBar.jsx / PrintSummary.jsx
-scripts/gen-icons.mjs        # generates /public app icons
-```
-
-## Notes
-
-- The "Order CORE100" button points at `BUY_URL` in `src/lib/config.js` — update it to the
-  real store URL (it appends `sku` + `qty` query params).
-- The brand logo is served locally from `public/core100-logo.png`, with a styled wordmark
-  fallback.
-- `_reference/` holds the extracted original bundle, kept for reference and git-ignored.
+React 18 · Vite · Tailwind CSS · Radix UI · lucide-react

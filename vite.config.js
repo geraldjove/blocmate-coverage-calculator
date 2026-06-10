@@ -1,37 +1,16 @@
-import { defineConfig } from 'vite'
+import path from 'node:path'
 import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vite'
 
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'favicon-32x32.png', 'apple-touch-icon.png', 'core100-logo.png'],
-      manifest: {
-        name: 'Blocmate CORE100 Coverage Calculator',
-        short_name: 'CORE100',
-        description:
-          'Estimate how much Blocmate CORE100 penetrating concrete sealer your project needs.',
-        theme_color: '#dc3947',
-        background_color: '#f7f7f5',
-        display: 'standalone',
-        start_url: '/',
-        scope: '/',
-        icons: [
-          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-          {
-            src: 'pwa-maskable-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
-        ],
-      },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-      },
-    }),
-  ],
+  // Honor the PORT env var (used by the integrated preview's autoPort) so the
+  // dev server binds the assigned port instead of falling back to 5173.
+  server: process.env.PORT ? { port: Number(process.env.PORT), strictPort: true } : undefined,
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  plugins: [react()],
 })

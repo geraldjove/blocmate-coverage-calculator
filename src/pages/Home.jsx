@@ -7,6 +7,15 @@ import ByVolumeTab from "@/components/ByVolumeTab";
 import ResultReport from "@/components/ResultReport";
 import headerLogo from "@/assets/core100-header.png";
 
+// Bundled, same-origin Montserrat woff2 files. We inline these as base64 into
+// the captured image so the fonts are guaranteed to render on every device,
+// with no dependency on a font CDN or cross-origin fetch at capture time.
+import mont300 from "@fontsource/montserrat/files/montserrat-latin-300-normal.woff2";
+import mont400 from "@fontsource/montserrat/files/montserrat-latin-400-normal.woff2";
+import mont500 from "@fontsource/montserrat/files/montserrat-latin-500-normal.woff2";
+import mont600 from "@fontsource/montserrat/files/montserrat-latin-600-normal.woff2";
+import mont700 from "@fontsource/montserrat/files/montserrat-latin-700-normal.woff2";
+
 const TABS = [
   { key: "area", label: "By Area" },
   { key: "volume", label: "By Volume" },
@@ -15,6 +24,36 @@ const TABS = [
 const pad = (n) => String(n).padStart(2, "0");
 const fileStamp = (d) =>
   `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+// Build (once) a self-contained @font-face stylesheet with the Montserrat
+// weights inlined as base64. Passing this to html-to-image as `fontEmbedCSS`
+// removes every network/CORS variable, so the report image always uses the
+// real fonts — including on mobile.
+const MONT_FACES = [
+  [300, mont300],
+  [400, mont400],
+  [500, mont500],
+  [600, mont600],
+  [700, mont700],
+];
+let fontEmbedCSSCache = null;
+async function getFontEmbedCSS() {
+  if (fontEmbedCSSCache) return fontEmbedCSSCache;
+  const faces = await Promise.all(
+    MONT_FACES.map(async ([weight, url]) => {
+      const buf = await (await fetch(url)).arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      let binary = "";
+      for (let i = 0; i < bytes.length; i += 1) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const base64 = btoa(binary);
+      return `@font-face{font-family:'Montserrat';font-style:normal;font-weight:${weight};font-display:swap;src:url(data:font/woff2;base64,${base64}) format('woff2');}`;
+    }),
+  );
+  fontEmbedCSSCache = faces.join("");
+  return fontEmbedCSSCache;
+}
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("area");
@@ -47,10 +86,12 @@ export default function Home() {
       const node = reportRef.current;
       if (!node) return;
 
+      const fontEmbedCSS = await getFontEmbedCSS();
       const blob = await toBlob(node, {
         pixelRatio: 2,
         cacheBust: true,
         backgroundColor: "#ffffff",
+        fontEmbedCSS,
       });
       if (!blob) return;
 
@@ -175,7 +216,7 @@ export default function Home() {
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: "bold", fontSize: "16px" }}
         >
           <Download className="h-5 w-5" />
-          {saving ? "Preparing…" : "Save Result"}
+          {saving ? "Preparing…" : "Save Report"}
         </Button>
         <Button
           onClick={() => window.close()}

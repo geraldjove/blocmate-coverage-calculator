@@ -100,11 +100,11 @@ export default function Home() {
       {/* end screenshot area */}
 
       {/* Actions */}
-      <div className="px-5 pb-8 max-w-lg mx-auto flex gap-3">
+      <div className="px-5 pb-8 max-w-lg mx-auto flex flex-col gap-3">
         <Button
           onClick={handleScreenshot}
           disabled={capturing}
-          className="flex-1 flex items-center justify-center gap-2 h-12 rounded-xl bg-white text-neutral-900 border border-neutral-200 hover:bg-neutral-50 disabled:opacity-60"
+          className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-white text-neutral-900 border border-neutral-200 hover:bg-neutral-50 disabled:opacity-60"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold', fontSize: '16px' }}
         >
           <Camera className="h-5 w-5" />
@@ -112,7 +112,7 @@ export default function Home() {
         </Button>
         <Button
           onClick={() => window.close()}
-          className="flex-1 flex items-center justify-center gap-2 h-12 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800"
+          className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800"
           style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold', fontSize: '16px' }}
         >
           <X className="h-5 w-5" />

@@ -85,7 +85,7 @@ export default function ByVolumeTab({ onReport }) {
         </label>
         <div className="flex items-center justify-center gap-4">
           <button
-            onClick={() => setUnits((prev) => Math.max(1, prev - 1))}
+            onClick={() => setUnits((prev) => Math.max(1, (parseInt(prev) || 1) - 1))}
             className="h-12 w-12 rounded-xl bg-neutral-100 flex items-center justify-center active:scale-95 transition-transform"
           >
             <Minus className="h-5 w-5 text-gray-500" />
@@ -103,7 +103,7 @@ export default function ByVolumeTab({ onReport }) {
             className="text-6xl font-light text-center w-44 bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
           <button
-            onClick={() => setUnits((prev) => prev + 1)}
+            onClick={() => setUnits((prev) => Math.max(1, (parseInt(prev) || 0) + 1))}
             className="h-12 w-12 rounded-xl bg-neutral-100 flex items-center justify-center active:scale-95 transition-transform"
           >
             <Plus className="h-5 w-5 text-gray-500" />

@@ -1,4 +1,3 @@
-import { Flame } from "lucide-react";
 import headerLogo from "@/assets/core100-header.png";
 
 // A polished, single-page report rendered off-screen and captured to an image
@@ -171,18 +170,18 @@ export default function ResultReport({ report, dateText }) {
             padding: 24,
           }}
         >
-          <div
+          <p
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              marginBottom: 18,
+              fontFamily: FONT,
+              fontSize: 26,
+              fontWeight: 600,
+              color: INK,
+              textAlign: "center",
+              margin: "0 0 18px",
             }}
           >
-            <Flame size={20} color="#374151" />
-            <p style={caps({ color: "#374151" })}>Recommended</p>
-          </div>
+            Recommended Purchase Order
+          </p>
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
             <RedCell label="SKU" value={report.recommended.sku} />
             <RedCell label="Quantity" value={report.recommended.units} />

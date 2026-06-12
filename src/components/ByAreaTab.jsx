@@ -98,7 +98,9 @@ export default function ByAreaTab({ onReport }) {
   }, [area, coats, buffer, calc, onReport]);
 
   const adjustArea = (delta) => {
-    setArea((prev) => Math.max(1, prev + delta));
+    // `area` may be a string (typed) or a number — coerce before math so the
+    // + button adds instead of string-concatenating ("10" + 1 -> "101").
+    setArea((prev) => Math.max(1, (parseInt(prev) || 0) + delta));
   };
 
   return (

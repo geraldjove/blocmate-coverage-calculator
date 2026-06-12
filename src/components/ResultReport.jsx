@@ -1,3 +1,4 @@
+import { Flame } from "lucide-react";
 import headerLogo from "@/assets/core100-header.png";
 
 // A polished, single-page report rendered off-screen and captured to an image
@@ -10,8 +11,18 @@ const MUTED = "#6b7280";
 const FAINT = "#9ca3af";
 const BRAND = "#dc3947";
 
-// Very faint card stroke — present but not noticeable.
-const CARD_BORDER = "1px solid #ececec";
+// Deep dark gray stroke around every report box.
+const CARD_BORDER = "1px solid #333333";
+
+// "1L" → "1 Liter", "4.5L" → "4.5 Liters"
+const skuFullName = (label) => {
+  const n = parseFloat(label);
+  return `${n} Liter${n === 1 ? "" : "s"}`;
+};
+
+// Thousands separators, decimals only when present: "5016.0" → "5,016"
+const fmtNum = (v) =>
+  Number(v).toLocaleString("en-US", { maximumFractionDigits: 1 });
 
 const caps = (extra = {}) => ({
   fontFamily: FONT,
@@ -53,7 +64,6 @@ function ResultCard({ label, value, sub }) {
         background: "#fff",
         border: CARD_BORDER,
         borderRadius: 16,
-        boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
         padding: "22px 16px",
         textAlign: "center",
         display: "flex",
@@ -84,7 +94,6 @@ function RedCell({ label, value }) {
         borderRadius: 12,
         padding: "16px 8px",
         textAlign: "center",
-        boxShadow: "0 8px 16px -8px rgba(220,57,71,0.6)",
       }}
     >
       <p style={caps({ color: "#fde2e4", marginBottom: 8 })}>{label}</p>
@@ -162,9 +171,18 @@ export default function ResultReport({ report, dateText }) {
             padding: 24,
           }}
         >
-          <p style={caps({ textAlign: "center", color: "#374151", marginBottom: 18 })}>
-            Recommended Purchase Order
-          </p>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              marginBottom: 18,
+            }}
+          >
+            <Flame size={20} color="#374151" />
+            <p style={caps({ color: "#374151" })}>Recommended</p>
+          </div>
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
             <RedCell label="SKU" value={report.recommended.sku} />
             <RedCell label="Quantity" value={report.recommended.units} />
@@ -172,7 +190,6 @@ export default function ResultReport({ report, dateText }) {
           <div
             style={{
               background: "rgba(255,255,255,0.6)",
-              border: CARD_BORDER,
               borderRadius: 12,
               padding: 18,
               textAlign: "center",
@@ -202,7 +219,7 @@ export default function ResultReport({ report, dateText }) {
           }}
         >
           <p style={caps({ marginBottom: 8 })}>{report.secondary.label}</p>
-          <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 40, color: INK }}>
+          <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 32, color: INK }}>
             {report.secondary.value}
           </div>
           {report.note && (
@@ -213,44 +230,73 @@ export default function ResultReport({ report, dateText }) {
         </div>
       )}
 
-      {/* All container options (By Area) */}
+      {/* All container options (By Area) — three flat cards on a light panel,
+          the recommended SKU outlined in brand red. */}
       {report.options && (
         <div
           style={{
             marginTop: 22,
-            border: CARD_BORDER,
+            background: "#f3f4f6",
             borderRadius: 16,
-            padding: "20px 24px",
+            padding: "22px 20px",
           }}
         >
-          <p style={caps({ textAlign: "center", marginBottom: 12 })}>All Container Options</p>
-          {report.options.map((o, idx) => (
-            <div
-              key={o.label}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "9px 0",
-                borderTop: idx === 0 ? "none" : "1px dashed #eceef1",
-              }}
-            >
-              <span
+          <p
+            style={{
+              fontFamily: FONT,
+              fontSize: 26,
+              fontWeight: 600,
+              color: INK,
+              textAlign: "center",
+              margin: "0 0 18px",
+            }}
+          >
+            All container options
+          </p>
+          <div style={{ display: "flex", gap: 14, alignItems: "stretch" }}>
+            {report.options.map((o) => (
+              <div
+                key={o.label}
                 style={{
-                  fontFamily: FONT,
-                  fontSize: 18,
-                  whiteSpace: "nowrap",
-                  color: o.recommended ? INK : MUTED,
-                  fontWeight: o.recommended ? 700 : 500,
+                  flex: 1,
+                  boxSizing: "border-box",
+                  background: "#fff",
+                  border: o.recommended ? `3px solid ${BRAND}` : "1px solid #333333",
+                  borderRadius: 16,
+                  padding: "18px 16px",
                 }}
               >
-                {o.label} &times; {o.units}
-              </span>
-              <span style={{ fontFamily: FONT, fontSize: 18, color: MUTED, whiteSpace: "nowrap" }}>
-                Total {o.total} L &middot; Left {o.leftover} L
-              </span>
-            </div>
-          ))}
+                <p
+                  style={{
+                    fontFamily: FONT,
+                    fontSize: 21,
+                    fontWeight: 700,
+                    color: INK,
+                    margin: "0 0 16px",
+                  }}
+                >
+                  {skuFullName(o.label)}
+                </p>
+                <p
+                  style={{
+                    fontFamily: FONT,
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: INK,
+                    margin: "0 0 4px",
+                  }}
+                >
+                  {fmtNum(o.units)} Unit{Number(o.units) === 1 ? "" : "s"}
+                </p>
+                <p style={{ fontFamily: FONT, fontSize: 16, color: "#374151", margin: "0 0 2px" }}>
+                  Total: {fmtNum(o.total)} L
+                </p>
+                <p style={{ fontFamily: FONT, fontSize: 16, color: "#374151", margin: 0 }}>
+                  Excess: {fmtNum(o.leftover)} L
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

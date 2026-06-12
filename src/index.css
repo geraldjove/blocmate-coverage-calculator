@@ -85,10 +85,19 @@
   html,
   body {
     font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+    /* Normalize glyph rendering: without this, iOS/macOS WebKit draws bold
+       Montserrat noticeably heavier than other platforms. */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Stop iOS Safari from inflating text when rotating to landscape. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
     @apply bg-background text-foreground;
+    /* Remove the gray flash iOS overlays on every tap. */
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Form controls don't inherit font-family in every browser — force it so the
@@ -98,5 +107,18 @@
   textarea,
   select {
     font-family: inherit;
+  }
+
+  /* Strip iOS Safari's native input chrome (inner shadow, rounded corners,
+     spin buttons) so the big number fields render identically everywhere. */
+  input[type="number"] {
+    -webkit-appearance: none;
+    appearance: textfield;
+    border-radius: 0;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }

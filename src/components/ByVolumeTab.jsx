@@ -135,8 +135,9 @@ export default function ByVolumeTab({ onReport }) {
       </div>
 
       {/* ── Results ── */}
+      {/* No filter/backdrop-filter here: large blurs inside overflow-hidden
+          cards rasterize as hard-edged gray boxes on iOS WebKit. */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 border border-gray-200 p-6 shadow-xl">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-gray-200/20 to-gray-100/20 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
         <div className="relative">
           <div className="flex items-center gap-2 mb-5 justify-center">
             <Flame className="h-5 w-5 text-gray-600" />
@@ -162,13 +163,13 @@ export default function ByVolumeTab({ onReport }) {
               <p className="text-xs font-semibold tracking-widest uppercase text-red-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
                 Approx Coverage
               </p>
-              <div className="text-4xl font-bold text-white">
+              <div className="text-2xl font-bold text-white whitespace-nowrap">
                 {calc.coverageFinal} m²
               </div>
             </div>
           </div>
 
-          <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 text-center">
+          <div className="bg-white/75 rounded-xl p-4 text-center">
             <p className="text-sm text-gray-900" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: '300' }}>
               Based on {coats} coat{coats > 1 ? "s" : ""} at {COVERAGE_RATE} m² per liter per coat.
             </p>

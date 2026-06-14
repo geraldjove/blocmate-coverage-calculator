@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Ruler, Droplet, X, Download } from "lucide-react";
 import { toBlob } from "html-to-image";
 import { Button } from "@/components/ui/button";
@@ -72,10 +72,20 @@ async function getFontEmbedCSS() {
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("area");
-  const [report, setReport] = useState(null);
+  // Keep each tab's latest result keyed by mode so switching tabs doesn't lose
+  // the other tab's numbers — this powers the cross-tab comparison and lets
+  // "Save Report" always capture whichever tab is active.
+  const [reports, setReports] = useState({ area: null, volume: null });
   const [savedAt, setSavedAt] = useState(null);
   const [saving, setSaving] = useState(false);
   const reportRef = useRef(null);
+
+  // Stable callback so the tab effects don't refire (and loop) every render.
+  const handleReport = useCallback(
+    (data) => setReports((prev) => ({ ...prev, [data.mode]: data })),
+    [],
+  );
+  const report = reports[activeTab];
 
   const saveResult = async () => {
     if (saving || !report) return;
@@ -166,14 +176,18 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#f7f7f5]">
-      {/* Header */}
-      <div className="px-5 pt-8 pb-0 max-w-lg mx-auto">
+      {/* Header — right-click disabled so the logo/title can't be copied or saved */}
+      <div
+        className="px-5 pt-8 pb-0 max-w-lg mx-auto"
+        onContextMenu={(e) => e.preventDefault()}
+      >
         <img
           src={headerLogo}
           alt="Blocmate CORE100"
           className="w-full mb-6 select-none"
           draggable={false}
-          style={{ userSelect: "none", WebkitUserDrag: "none" }}
+          onContextMenu={(e) => e.preventDefault()}
+          style={{ userSelect: "none", WebkitUserDrag: "none", pointerEvents: "none" }}
         />
         <h1
           className="text-neutral-900 text-center"
@@ -212,13 +226,15 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Tab Content */}
+      {/* Tab Content — both tabs stay mounted (inactive one hidden) so their
+          inputs/results persist across switches and feed the comparison. */}
       <div className="px-5 py-4 max-w-lg mx-auto">
-        {activeTab === "area" ? (
-          <ByAreaTab onReport={setReport} />
-        ) : (
-          <ByVolumeTab onReport={setReport} />
-        )}
+        <div className={activeTab === "area" ? "" : "hidden"}>
+          <ByAreaTab onReport={handleReport} />
+        </div>
+        <div className={activeTab === "volume" ? "" : "hidden"}>
+          <ByVolumeTab onReport={handleReport} areaReport={reports.area} />
+        </div>
       </div>
 
       {/* Actions */}

@@ -10,7 +10,7 @@ const SKUS = [
   { label: "22L", liters: 22 },
 ];
 
-export default function ByVolumeTab({ onReport, areaReport }) {
+export default function ByVolumeTab({ onReport }) {
   const [selectedSku, setSelectedSku] = useState(0); // index into SKUS
   const [units, setUnits] = useState(1);
   const [coats, setCoats] = useState(1);
@@ -176,48 +176,6 @@ export default function ByVolumeTab({ onReport, areaReport }) {
           </div>
         </div>
       </div>
-
-      {/* ── By Area comparison ── shows the latest result from the By Area tab
-          so the user can compare the two estimates side by side. */}
-      {areaReport && (
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-gray-100">
-          <p className="text-xs font-semibold tracking-widest uppercase text-gray-500 text-center" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
-            From the By Area Tab
-          </p>
-          <p className="text-[11px] text-gray-400 text-center mb-4" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: '300' }}>
-            For comparison with your volume above
-          </p>
-
-          <div className="flex justify-center gap-6 mb-4 text-center">
-            {areaReport.inputs.map((i) => (
-              <div key={i.label}>
-                <p className="text-[10px] uppercase tracking-wide text-gray-400" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
-                  {i.label}
-                </p>
-                <p className="text-sm text-gray-900" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
-                  {i.value}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <span className="text-3xl font-bold text-gray-900">{areaReport.primary.value}</span>
-            {areaReport.primary.sub && (
-              <span className="text-sm text-gray-500 ml-1">({areaReport.primary.sub})</span>
-            )}
-          </div>
-
-          {areaReport.recommended && (
-            <div className="bg-neutral-50 rounded-xl p-3 mt-4 text-center text-sm text-gray-900" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: '300' }}>
-              Recommended:{" "}
-              <span className="font-bold">
-                {areaReport.recommended.units} × {areaReport.recommended.sku}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* ── Coverage Note ── */}
       <p className="text-sm text-gray-900 leading-relaxed px-2" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: '300' }}>

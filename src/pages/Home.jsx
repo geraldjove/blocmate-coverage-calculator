@@ -233,7 +233,7 @@ export default function Home() {
           <ByAreaTab onReport={handleReport} />
         </div>
         <div className={activeTab === "volume" ? "" : "hidden"}>
-          <ByVolumeTab onReport={handleReport} areaReport={reports.area} />
+          <ByVolumeTab onReport={handleReport} />
         </div>
       </div>
 

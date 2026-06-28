@@ -305,15 +305,18 @@ export default function ResultReport({ report, dateText }) {
           fontWeight: 400,
           fontSize: 14,
           lineHeight: 1.55,
-          color: FAINT,
+          color: INK,
           marginTop: 26,
           marginBottom: 0,
         }}
       >
-        Coverage rates per coat are approximate and based on fully cured, untreated,
-        textured concrete surfaces using the wet-on-wet application method. Actual coverage
-        will vary depending on the porosity and absorption of the substrate. These figures
-        are intended for estimation purposes only.
+        Coverage rates per coat are approximate and{" "}
+        <span style={{ fontWeight: 700 }}>
+          based on fully cured, untreated, textured concrete surfaces using the wet-on-wet
+          application method.
+        </span>{" "}
+        Actual coverage will vary depending on the porosity and absorption of the substrate.
+        These figures are intended for estimation purposes only.
       </p>
     </div>
   );

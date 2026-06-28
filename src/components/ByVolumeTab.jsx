@@ -1,27 +1,25 @@
 import { useState, useMemo, useEffect } from "react";
 import { Plus, Minus, Flame } from "lucide-react";
 
-// ── Constants ──
-const COVERAGE_RATE = 6; // m² per liter per coat
+// ── Constants (SHINE100) ──
+const COVERAGE_RATE = 4; // m² per liter
 const GALLONS_PER_LITER = 3.78541;
 const SKUS = [
   { label: "1L", liters: 1 },
-  { label: "4.5L", liters: 4.5 },
-  { label: "22L", liters: 22 },
+  { label: "4L", liters: 4 },
+  { label: "20L", liters: 20 },
 ];
 
 export default function ByVolumeTab({ onReport }) {
   const [selectedSku, setSelectedSku] = useState(0); // index into SKUS
   const [units, setUnits] = useState(1);
-  const [coats, setCoats] = useState(1);
 
   const calc = useMemo(() => {
     const sku = SKUS[selectedSku];
     const unitsValue = parseInt(units) || 1;
     const totalLiters = sku.liters * unitsValue;
     const gallonsTotal = totalLiters / GALLONS_PER_LITER;
-    const coverageRaw = totalLiters * COVERAGE_RATE;
-    const coverageFinal = coverageRaw / coats;
+    const coverageFinal = totalLiters * COVERAGE_RATE;
 
     return {
       totalLiters,
@@ -29,16 +27,15 @@ export default function ByVolumeTab({ onReport }) {
       coverageFinal: coverageFinal.toFixed(1),
       skuLabel: sku.label,
     };
-  }, [selectedSku, units, coats]);
+  }, [selectedSku, units]);
 
-  // Report current inputs and results up to Home for the "Save Result" report.
+  // Report current inputs and results up to Home for the saved report.
   useEffect(() => {
     onReport?.({
       mode: "volume",
       inputs: [
         { label: "Container Size", value: calc.skuLabel },
         { label: "Containers", value: parseInt(units) || 1 },
-        { label: "Coats", value: coats },
       ],
       primary: {
         label: "Total Volume",
@@ -49,9 +46,9 @@ export default function ByVolumeTab({ onReport }) {
         label: "Approx Coverage",
         value: `${calc.coverageFinal} m²`,
       },
-      note: `Based on ${coats} coat${coats > 1 ? "s" : ""} at ${COVERAGE_RATE} m² per liter per coat.`,
+      note: `Based on ${COVERAGE_RATE} m² per liter coverage rate.`,
     });
-  }, [selectedSku, units, coats, calc, onReport]);
+  }, [selectedSku, units, calc, onReport]);
 
   return (
     <div className="space-y-5">
@@ -111,32 +108,7 @@ export default function ByVolumeTab({ onReport }) {
         </div>
       </div>
 
-      {/* ── Coats ── */}
-      <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-        <label className="text-xs font-semibold tracking-widest uppercase text-gray-500 mb-3 block text-center" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
-          Coats
-        </label>
-        <div className="flex gap-2">
-          {[1, 2, 3].map((c) => (
-            <button
-              key={c}
-              onClick={() => setCoats(c)}
-              className={`flex-1 h-11 rounded-xl text-sm font-semibold transition-all ${
-                coats === c
-                  ? "bg-neutral-900 text-white shadow-md"
-                  : "bg-neutral-100 text-gray-500 hover:bg-neutral-200"
-              }`}
-              style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* ── Results ── */}
-      {/* No filter/backdrop-filter here: large blurs inside overflow-hidden
-          cards rasterize as hard-edged gray boxes on iOS WebKit. */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 border border-gray-200 p-6 shadow-xl">
         <div className="relative">
           <div className="flex items-center gap-2 mb-5 justify-center">
@@ -145,22 +117,22 @@ export default function ByVolumeTab({ onReport }) {
               Results
             </span>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-3 mb-5">
-            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#dc3947' }}>
-              <p className="text-xs font-semibold tracking-widest uppercase text-red-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
+            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4b9ca0' }}>
+              <p className="text-xs font-semibold tracking-widest uppercase text-cyan-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
                 Total Volume
               </p>
               <div className="text-3xl font-bold text-white mb-1">
                 {calc.totalLiters} L
               </div>
-              <div className="text-sm text-red-100">
+              <div className="text-sm text-cyan-100">
                 ({calc.gallonsTotal} gal)
               </div>
             </div>
 
-            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#dc3947' }}>
-              <p className="text-xs font-semibold tracking-widest uppercase text-red-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
+            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4b9ca0' }}>
+              <p className="text-xs font-semibold tracking-widest uppercase text-cyan-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
                 Approx Coverage
               </p>
               <div className="text-2xl font-bold text-white whitespace-nowrap">
@@ -171,7 +143,7 @@ export default function ByVolumeTab({ onReport }) {
 
           <div className="bg-white/75 rounded-xl p-4 text-center">
             <p className="text-sm text-gray-900" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: '300' }}>
-              Based on {coats} coat{coats > 1 ? "s" : ""} at {COVERAGE_RATE} m² per liter per coat.
+              Based on {COVERAGE_RATE} m² per liter coverage rate.
             </p>
           </div>
         </div>
@@ -179,7 +151,7 @@ export default function ByVolumeTab({ onReport }) {
 
       {/* ── Coverage Note ── */}
       <p className="text-sm text-gray-900 leading-relaxed px-2" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: '300' }}>
-        Coverage rates per coat are approximate and based on smooth, horizontal surfaces. Actual coverage will vary depending on the condition and absorbency of the concrete. These figures are intended for estimation purposes only. For optimal performance, up to three (3) coats may be applied.
+        Coverage rates per coat are approximate and <span style={{ fontWeight: 'bold' }}>based on smooth, horizontal surfaces.</span> These figures are intended for estimation purposes only.
       </p>
     </div>
   );

@@ -1,26 +1,22 @@
 import { useState, useMemo, useEffect } from "react";
 import { Plus, Minus, Flame } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
 
-// ── Constants ──
-const COVERAGE_RATE = 6; // m² per liter per coat
+// ── Constants (SHINE100) ──
+const COVERAGE_RATE = 4; // m² per liter
 const GALLONS_PER_LITER = 3.78541;
 const SKUS = [
   { label: "1L", liters: 1 },
-  { label: "4.5L", liters: 4.5 },
-  { label: "22L", liters: 22 },
+  { label: "4L", liters: 4 },
+  { label: "20L", liters: 20 },
 ];
 
 export default function ByAreaTab({ onReport }) {
   const [area, setArea] = useState(10);
-  const [coats, setCoats] = useState(1);
-  const [buffer, setBuffer] = useState(0);
 
   // ── Core calculations ──
   const calc = useMemo(() => {
     const areaValue = parseInt(area) || 1;
-    const litersRaw = (areaValue * coats) / COVERAGE_RATE;
-    const litersNeeded = litersRaw * (1 + buffer / 100);
+    const litersNeeded = areaValue / COVERAGE_RATE;
     const gallonsNeeded = litersNeeded / GALLONS_PER_LITER;
 
     // Single-SKU estimates
@@ -32,28 +28,18 @@ export default function ByAreaTab({ onReport }) {
     });
 
     // ── Recommendation logic ──
-    // Filter out SKUs that meet the minimum liters needed
-    // Also exclude SKUs with too many units (impractical)
-    const viableSkus = skuEstimates.filter(s => {
+    // Keep only SKUs that meet the litres needed, excluding impractical piles
+    // of small tins.
+    const viableSkus = skuEstimates.filter((s) => {
       if (s.totalLiters < litersNeeded) return false;
-      // Don't recommend 1L if 7+ units needed (7L+)
-      if (s.liters === 1 && s.units >= 7) return false;
-      // Don't recommend 4.5L if 9+ units needed (40.5L+)
-      if (s.liters === 4.5 && s.units >= 9) return false;
+      if (s.liters === 1 && s.units >= 7) return false; // don't recommend 1L at 7L+
+      if (s.liters === 4 && s.units >= 8) return false; // don't recommend 4L at 32L+
       return true;
     });
 
-    // Sort viable SKUs to minimize leftover
     const sortedViableSkus = [...viableSkus].sort((a, b) => {
-      // Priority 1: Less leftover
-      if (a.leftover !== b.leftover) {
-        return a.leftover - b.leftover;
-      }
-      // Priority 2: Fewer units
-      if (a.units !== b.units) {
-        return a.units - b.units;
-      }
-      // Priority 3: Larger container size
+      if (a.leftover !== b.leftover) return a.leftover - b.leftover;
+      if (a.units !== b.units) return a.units - b.units;
       return b.liters - a.liters;
     });
 
@@ -65,17 +51,13 @@ export default function ByAreaTab({ onReport }) {
       skuEstimates,
       recommended,
     };
-  }, [area, coats, buffer]);
+  }, [area]);
 
-  // Report current inputs and results up to Home for the "Save Result" report.
+  // Report current inputs and results up to Home for the saved report.
   useEffect(() => {
     onReport?.({
       mode: "area",
-      inputs: [
-        { label: "Area", value: `${parseInt(area) || 1} m²` },
-        { label: "Coats", value: coats },
-        { label: "Buffer", value: `${buffer}%` },
-      ],
+      inputs: [{ label: "Area", value: `${parseInt(area) || 1} m²` }],
       primary: {
         label: "You'll Need Approximately",
         value: `${calc.litersNeeded} L`,
@@ -95,7 +77,7 @@ export default function ByAreaTab({ onReport }) {
         recommended: s.label === calc.recommended.label,
       })),
     });
-  }, [area, coats, buffer, calc, onReport]);
+  }, [area, calc, onReport]);
 
   const adjustArea = (delta) => {
     // `area` may be a string (typed) or a number — coerce before math so the
@@ -141,45 +123,6 @@ export default function ByAreaTab({ onReport }) {
         </div>
       </div>
 
-      {/* ── Coats & Buffer ── */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-          <label className="text-xs font-semibold tracking-widest uppercase text-gray-500 mb-3 block text-center" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
-            Coats
-          </label>
-          <div className="flex gap-2">
-            {[1, 2, 3].map((c) => (
-              <button
-                key={c}
-                onClick={() => setCoats(c)}
-                className={`flex-1 h-11 rounded-xl text-sm font-semibold transition-all ${
-                  coats === c
-                    ? "bg-neutral-900 text-white shadow-md"
-                    : "bg-neutral-100 text-gray-500 hover:bg-neutral-200"
-                }`}
-                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-          <label className="text-xs font-semibold tracking-widest uppercase text-gray-500 mb-2 block text-center" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
-            Buffer
-          </label>
-          <div className="text-2xl font-light text-center mb-2 text-gray-900">{buffer}%</div>
-          <Slider
-            value={[buffer]}
-            onValueChange={([v]) => setBuffer(v)}
-            max={20}
-            min={0}
-            step={1}
-            className="[&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&_[role=slider]]:bg-neutral-900 [&_[role=slider]]:border-0 [&_[role=slider]]:shadow-md"
-          />
-        </div>
-      </div>
-
       {/* ── Volume Needed ── */}
       <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)] text-center">
         <p className="text-xs font-semibold tracking-widest uppercase text-gray-500 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
@@ -206,10 +149,10 @@ export default function ByAreaTab({ onReport }) {
               Recommended
             </span>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-3 mb-5">
-            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#dc3947' }}>
-              <p className="text-xs font-semibold tracking-widest uppercase text-red-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
+            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4b9ca0' }}>
+              <p className="text-xs font-semibold tracking-widest uppercase text-cyan-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
                 SKU
               </p>
               <div className="text-3xl font-bold text-white">
@@ -217,8 +160,8 @@ export default function ByAreaTab({ onReport }) {
               </div>
             </div>
 
-            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#dc3947' }}>
-              <p className="text-xs font-semibold tracking-widest uppercase text-red-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
+            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4b9ca0' }}>
+              <p className="text-xs font-semibold tracking-widest uppercase text-cyan-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
                 Quantity
               </p>
               <div className="text-3xl font-bold text-white">
@@ -256,8 +199,8 @@ export default function ByAreaTab({ onReport }) {
               <div
                 key={sku.label}
                 className={`flex items-center justify-between p-4 rounded-xl transition-all ${
-                  isRec 
-                    ? "bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 shadow-md" 
+                  isRec
+                    ? "bg-gradient-to-r from-cyan-50 to-teal-50 border border-cyan-200 shadow-md"
                     : "bg-white border border-gray-200 hover:border-gray-300"
                 }`}
               >
@@ -265,7 +208,7 @@ export default function ByAreaTab({ onReport }) {
                   <div
                     className={`h-11 w-11 rounded-lg flex items-center justify-center text-sm font-bold shadow-sm ${
                       isRec
-                        ? "bg-red-100 text-red-700 border border-red-200"
+                        ? "bg-cyan-100 text-cyan-700 border border-cyan-200"
                         : "bg-gray-100 text-gray-500 border border-gray-200"
                     }`}
                   >
@@ -294,7 +237,7 @@ export default function ByAreaTab({ onReport }) {
 
       {/* ── Coverage Note ── */}
       <p className="text-sm text-gray-900 leading-relaxed px-2" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: '300' }}>
-        Coverage rates per coat are approximate and based on smooth, horizontal surfaces. Actual coverage will vary depending on the condition and absorbency of the concrete. These figures are intended for estimation purposes only. For optimal performance, up to three (3) coats may be applied.
+        Coverage rates per coat are approximate and <span style={{ fontWeight: 'bold' }}>based on smooth, horizontal surfaces.</span> These figures are intended for estimation purposes only.
       </p>
     </div>
   );

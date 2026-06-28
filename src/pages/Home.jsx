@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import ByAreaTab from "@/components/ByAreaTab";
 import ByVolumeTab from "@/components/ByVolumeTab";
 import ResultReport from "@/components/ResultReport";
-import headerLogo from "@/assets/core100-header.png";
+import headerLogo from "@/assets/shine100-header.png";
 
 // Bundled, same-origin Montserrat woff2 files. We inline these as base64 into
 // the captured image so the fonts are guaranteed to render on every device,
@@ -120,7 +120,7 @@ export default function Home() {
       });
       if (!blob) return;
 
-      const fileName = `core100-coverage-${activeTab}-${fileStamp(stamp)}.png`;
+      const fileName = `shine100-coverage-${activeTab}-${fileStamp(stamp)}.png`;
 
       // 1) Desktop browsers with the File System Access API → real "Save As"
       //    dialog that lets the user choose the destination.
@@ -149,7 +149,7 @@ export default function Home() {
         try {
           await navigator.share({
             files: [file],
-            title: "CORE100 Coverage Report",
+            title: "SHINE100 Coverage Report",
           });
           return;
         } catch (err) {
@@ -183,7 +183,7 @@ export default function Home() {
       >
         <img
           src={headerLogo}
-          alt="Blocmate CORE100"
+          alt="Blocmate SHINE100"
           className="w-full mb-6 select-none"
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}

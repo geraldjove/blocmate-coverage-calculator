@@ -310,9 +310,8 @@ export default function ResultReport({ report, dateText }) {
           marginBottom: 0,
         }}
       >
-        Coverage rates are approximate and based on smooth, horizontal surfaces. Actual
-        coverage varies with the condition and absorbency of the concrete. For estimation
-        purposes only.
+        Coverage rates per coat are approximate and based on smooth, horizontal surfaces.
+        These figures are intended for estimation purposes only.
       </p>
     </div>
   );

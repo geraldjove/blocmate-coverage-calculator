@@ -305,12 +305,13 @@ export default function ResultReport({ report, dateText }) {
           fontWeight: 400,
           fontSize: 14,
           lineHeight: 1.55,
-          color: FAINT,
+          color: INK,
           marginTop: 26,
           marginBottom: 0,
         }}
       >
-        Coverage rates per coat are approximate and based on smooth, horizontal surfaces.
+        Coverage rates per coat are approximate and{" "}
+        <span style={{ fontWeight: 700 }}>based on smooth, horizontal surfaces.</span>{" "}
         These figures are intended for estimation purposes only.
       </p>
     </div>

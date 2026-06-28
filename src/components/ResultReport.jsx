@@ -1,4 +1,4 @@
-import headerLogo from "@/assets/core500-header.png";
+import headerLogo from "@/assets/shine100-header.png";
 
 // A polished, single-page report rendered off-screen and captured to an image
 // by Home. Mirrors the calculator's card styling. All styling is inline so it
@@ -8,7 +8,7 @@ const FONT = "'Montserrat', sans-serif";
 const INK = "#111827";
 const MUTED = "#6b7280";
 const FAINT = "#9ca3af";
-const BRAND = "#4458a4";
+const BRAND = "#4b9ca0";
 
 // Deep dark gray stroke around every report box.
 const CARD_BORDER = "1px solid #333333";
@@ -95,7 +95,7 @@ function RedCell({ label, value }) {
         textAlign: "center",
       }}
     >
-      <p style={caps({ color: "#dbe3f7", marginBottom: 8 })}>{label}</p>
+      <p style={caps({ color: "#d6ecec", marginBottom: 8 })}>{label}</p>
       <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 40, color: "#fff" }}>
         {value}
       </div>
@@ -119,7 +119,7 @@ export default function ResultReport({ report, dateText }) {
     >
       <img
         src={headerLogo}
-        alt="Blocmate CORE500"
+        alt="Blocmate SHINE100"
         style={{ width: "100%", display: "block", marginBottom: 28 }}
       />
 
@@ -311,11 +311,7 @@ export default function ResultReport({ report, dateText }) {
         }}
       >
         Coverage rates per coat are approximate and{" "}
-        <span style={{ fontWeight: 700 }}>
-          based on fully cured, untreated, textured concrete surfaces using the wet-on-wet
-          application method.
-        </span>{" "}
-        Actual coverage will vary depending on the porosity and absorption of the substrate.
+        <span style={{ fontWeight: 700 }}>based on smooth, horizontal surfaces.</span>{" "}
         These figures are intended for estimation purposes only.
       </p>
     </div>

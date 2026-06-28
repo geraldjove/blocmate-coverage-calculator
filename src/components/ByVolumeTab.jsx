@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { Plus, Minus, Flame } from "lucide-react";
 
-// ── Constants (CORE500) ──
-const COVERAGE_RATE = 1.75; // m² per liter
+// ── Constants (SHINE100) ──
+const COVERAGE_RATE = 4; // m² per liter
 const GALLONS_PER_LITER = 3.78541;
 const SKUS = [
   { label: "1L", liters: 1 },
@@ -119,20 +119,20 @@ export default function ByVolumeTab({ onReport }) {
           </div>
 
           <div className="grid grid-cols-2 gap-3 mb-5">
-            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4458a4' }}>
-              <p className="text-xs font-semibold tracking-widest uppercase text-blue-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
+            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4b9ca0' }}>
+              <p className="text-xs font-semibold tracking-widest uppercase text-cyan-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
                 Total Volume
               </p>
               <div className="text-3xl font-bold text-white mb-1">
                 {calc.totalLiters} L
               </div>
-              <div className="text-sm text-blue-100">
+              <div className="text-sm text-cyan-100">
                 ({calc.gallonsTotal} gal)
               </div>
             </div>
 
-            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4458a4' }}>
-              <p className="text-xs font-semibold tracking-widest uppercase text-blue-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
+            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4b9ca0' }}>
+              <p className="text-xs font-semibold tracking-widest uppercase text-cyan-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
                 Approx Coverage
               </p>
               <div className="text-2xl font-bold text-white whitespace-nowrap">
@@ -151,7 +151,7 @@ export default function ByVolumeTab({ onReport }) {
 
       {/* ── Coverage Note ── */}
       <p className="text-sm text-gray-900 leading-relaxed px-2" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: '300' }}>
-        Coverage rates per coat are approximate and <span style={{ fontWeight: 'bold' }}>based on fully cured, untreated, textured concrete surfaces using the wet-on-wet application method.</span> Actual coverage will vary depending on the porosity and absorption of the substrate. These figures are intended for estimation purposes only.
+        Coverage rates per coat are approximate and <span style={{ fontWeight: 'bold' }}>based on smooth, horizontal surfaces.</span> These figures are intended for estimation purposes only.
       </p>
     </div>
   );

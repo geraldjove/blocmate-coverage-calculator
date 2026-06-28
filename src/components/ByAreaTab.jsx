@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { Plus, Minus, Flame } from "lucide-react";
 
-// ── Constants (CORE500) ──
-const COVERAGE_RATE = 1.75; // m² per liter
+// ── Constants (SHINE100) ──
+const COVERAGE_RATE = 4; // m² per liter
 const GALLONS_PER_LITER = 3.78541;
 const SKUS = [
   { label: "1L", liters: 1 },
@@ -151,8 +151,8 @@ export default function ByAreaTab({ onReport }) {
           </div>
 
           <div className="grid grid-cols-2 gap-3 mb-5">
-            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4458a4' }}>
-              <p className="text-xs font-semibold tracking-widest uppercase text-blue-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
+            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4b9ca0' }}>
+              <p className="text-xs font-semibold tracking-widest uppercase text-cyan-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
                 SKU
               </p>
               <div className="text-3xl font-bold text-white">
@@ -160,8 +160,8 @@ export default function ByAreaTab({ onReport }) {
               </div>
             </div>
 
-            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4458a4' }}>
-              <p className="text-xs font-semibold tracking-widest uppercase text-blue-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
+            <div className="rounded-xl p-4 text-center shadow-lg" style={{ backgroundColor: '#4b9ca0' }}>
+              <p className="text-xs font-semibold tracking-widest uppercase text-cyan-100 mb-3" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 'bold' }}>
                 Quantity
               </p>
               <div className="text-3xl font-bold text-white">
@@ -200,7 +200,7 @@ export default function ByAreaTab({ onReport }) {
                 key={sku.label}
                 className={`flex items-center justify-between p-4 rounded-xl transition-all ${
                   isRec
-                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-md"
+                    ? "bg-gradient-to-r from-cyan-50 to-teal-50 border border-cyan-200 shadow-md"
                     : "bg-white border border-gray-200 hover:border-gray-300"
                 }`}
               >
@@ -208,7 +208,7 @@ export default function ByAreaTab({ onReport }) {
                   <div
                     className={`h-11 w-11 rounded-lg flex items-center justify-center text-sm font-bold shadow-sm ${
                       isRec
-                        ? "bg-blue-100 text-blue-700 border border-blue-200"
+                        ? "bg-cyan-100 text-cyan-700 border border-cyan-200"
                         : "bg-gray-100 text-gray-500 border border-gray-200"
                     }`}
                   >
@@ -237,7 +237,7 @@ export default function ByAreaTab({ onReport }) {
 
       {/* ── Coverage Note ── */}
       <p className="text-sm text-gray-900 leading-relaxed px-2" style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: '300' }}>
-        Coverage rates per coat are approximate and <span style={{ fontWeight: 'bold' }}>based on fully cured, untreated, textured concrete surfaces using the wet-on-wet application method.</span> Actual coverage will vary depending on the porosity and absorption of the substrate. These figures are intended for estimation purposes only.
+        Coverage rates per coat are approximate and <span style={{ fontWeight: 'bold' }}>based on smooth, horizontal surfaces.</span> These figures are intended for estimation purposes only.
       </p>
     </div>
   );

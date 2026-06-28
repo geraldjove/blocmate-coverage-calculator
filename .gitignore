@@ -28,3 +28,6 @@ dist-ssr
 *.sw?
 
 .env
+# Local reference assets and packaged build zips (not deployed)
+/assets/
+*.zip
